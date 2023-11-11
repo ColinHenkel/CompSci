@@ -1,0 +1,10 @@
+To begin my testing, I drew 2 weighted graphs in paint, and traced them using Dijkstra's, ensuring that each graph tested different aspects of the problem. 
+Graph 1, which is represented in test_1.txt, has a single treasure on the road (5,6), as taking the shortest path from the capital 1 to city 6, results in one treasure being on the road (5,6).
+Graph 2, which is represented in test_2.txt, has a single treasure in city 6, as the shortest path from the capital 1 to city 6 is 14 exactly, which is the only path with that value.
+
+Correct Output for test_1.txt:
+In cities: 0
+On the road: 1
+Correct Output for test_2.txt:
+In cities: 1
+On the road: 0
