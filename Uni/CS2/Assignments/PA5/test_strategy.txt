@@ -3,8 +3,8 @@ Graph 1, which is represented in test_1.txt, has a single treasure on the road (
 Graph 2, which is represented in test_2.txt, has a single treasure in city 6, as the shortest path from the capital 1 to city 6 is 14 exactly, which is the only path with that value.
 
 Correct Output for test_1.txt:
-In cities: 0
+In city: 0
 On the road: 1
 Correct Output for test_2.txt:
-In cities: 1
+In city: 1
 On the road: 0
