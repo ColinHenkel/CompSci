@@ -22,20 +22,17 @@ public class PA6 {
     }
 
     public static int maxProblemsTabulation(int n, int[][] problems) {
-        // init dp table and first indices
+        // init dp table and base cases
         int[][] dp = new int[2][n+1];
         dp[0][0] = problems[0][0];
         dp[1][0] = problems[1][0];
+        dp[0][1] = problems[0][0];
+        dp[1][1] = problems[1][0];
 
-        for (int i = 1; i <= n; i++) {
-            if(i == 1) {
-                dp[0][i] = problems[0][i - 1];
-                dp[1][i] = problems[1][i - 1];
-            } else {
-                // calculate the maximum problems for the current row
-                dp[0][i] = Math.max(dp[1][i - 1], dp[1][i - 2]) + problems[0][i - 1];
-                dp[1][i] = Math.max(dp[0][i - 1], dp[0][i - 2]) + problems[1][i - 1];
-            }
+        for (int i = 2; i <= n; i++) {
+            // calculate the maximum problems based on row
+            dp[0][i] = Math.max(dp[1][i - 1], dp[1][i - 2]) + problems[0][i - 1];
+            dp[1][i] = Math.max(dp[0][i - 1], dp[0][i - 2]) + problems[1][i - 1];
         }
 
         return Math.max(dp[0][n], dp[1][n]);
