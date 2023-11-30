@@ -1,45 +1,39 @@
 #include "spimcore.h"
 
+/* Colin Henkel Final Project CDA3103 */
+
 /* ALU */
 /* 10 Points */
 void ALU(unsigned A,unsigned B,char ALUControl,unsigned *ALUresult,char *Zero)
 {
-    if(ALUControl == 0b000) // add
-		*ALUresult = A + B;
-	else if(ALUControl == 0b001) // sub
-		*ALUresult = A - B;
-	
-	else if(ALUControl == 0b010) { // slt
-		int tempA = (int) A;
-		int tempB = (int) B;
-		
-		if(tempA < tempB) 
-			*ALUresult = 1;
-		else 
-			*ALUresult = 0;
-	}
-
-	else if(ALUControl == 0b011) { // sltu
-		if(A < B)
-			*ALUresult = 1;
-		else 
-			*ALUresult = 0;
+    switch (ALUControl) {
+        case 0: // add
+            *ALUresult = A + B;
+            break;
+        case 1: // subtract
+            *ALUresult = A - B;
+            break;
+        case 2: // slt
+            *ALUresult = ((int) A < (int) B) ? 1 : 0;
+            break;
+        case 3: // sltu
+            *ALUresult = (A < B) ? 1 : 0;
+            break;
+        case 4: // and
+            *ALUresult = (A & B);
+            break;
+        case 5: // or
+            *ALUresult = (A | B);
+            break;
+        case 6: // shift left
+            *ALUresult = B << 16;
+            break;
+        case 7: // not
+            *ALUresult = ~A;
+            break;
     }
 
-	else if(ALUControl == 0b100) // and
-		*ALUresult = A & B;
-	else if(ALUControl == 0b101) // or
-		*ALUresult = A | B;
-	else if(ALUControl == 0b110) // B << 16 bits
-		*ALUresult = B << 16;
-	else if(ALUControl == 0b111) // flip A
-		*ALUresult = ~A;
-	if(*ALUresult == 0) // set the zero output
-		*Zero = 1;
-	else 
-		*Zero = 0;
-	
-	return;
+    *Zero = (*ALUresult == 0) ? 1 : 0;
 }
 
 /* instruction fetch */
@@ -57,13 +51,13 @@ int instruction_fetch(unsigned PC,unsigned *Mem,unsigned *instruction)
 /* 10 Points */
 void instruction_partition(unsigned instruction, unsigned *op, unsigned *r1,unsigned *r2, unsigned *r3, unsigned *funct, unsigned *offset, unsigned *jsec)
 {
-	*op     = (instruction & 0xfc000000) >> 26; // 31-26
-	*r1     = (instruction & 0x03e00000) >> 21; // 25-21
-	*r2     = (instruction & 0x001f0000) >> 16; // 20-16
-	*r3     = (instruction & 0x0000f800) >> 11; // 15-11
-	*funct  =  instruction & 0x0000003f;
-	*offset =  instruction & 0x0000ffff;	
-	*jsec   =  instruction & 0x03ffffff;	
+	*op = (instruction & 0xfc000000) >> 26; // 31-26
+	*r1 = (instruction & 0x03e00000) >> 21; // 25-21
+	*r2 = (instruction & 0x1f0000) >> 16; // 20-16
+	*r3 = (instruction & 0xf800) >> 11; // 15-11
+	*funct = instruction & 0x3f;
+	*offset = instruction & 0xffff;	
+	*jsec = instruction & 0x3ffffff;	
 }
 
 /* instruction decode */
@@ -141,16 +135,59 @@ void read_register(unsigned r1,unsigned r2,unsigned *Reg,unsigned *data1,unsigne
 void sign_extend(unsigned offset,unsigned *extended_value)
 {
     if((offset >> 15) == 1)
-        *extended_value = offset | 0xFFFF0000; // perform sign extension for negative values
+        *extended_value = offset | 0xffff0000; // perform sign extension for negative values
     else
-        *extended_value = offset & 0x0000FFFF; // if not negative copy lower 16 bits
+        *extended_value = offset & 0x0000ffff; // if not negative copy lower 16 bits
 }
 
 /* ALU operations */
 /* 10 Points */
 int ALU_operations(unsigned data1,unsigned data2,unsigned extended_value,unsigned funct,char ALUOp,char ALUSrc,unsigned *ALUresult,char *Zero)
 {
+    char ALUControl = 0;
 
+    if(ALUOp == 7) {
+        switch(funct) {
+            case (0) : //shift left
+                ALUControl = 6;
+                break;
+            case (32) : //addition
+                ALUControl = 0;
+                break;
+            case (34) : //subtraction
+                ALUControl = 1;
+                break;
+            case (36) : //and
+                ALUControl = 4;
+                break;
+            case (37) : //or
+                ALUControl = 5;
+                break;
+            case (39) : //not (nor)
+                ALUControl = 7;
+                break;
+            case (42) : //set less than
+                ALUControl = 2;
+                break;
+            case (43) : //set less than unsigned
+                ALUControl = 3;
+                break;
+            default:
+                return 1;
+        }
+
+        ALU(data1, data2, ALUControl, ALUresult, Zero);
+        return 0;
+    }
+
+    else if ((ALUOp >= 0) && (ALUOp < 7)) {
+        //I-Type instruction (or J-type, but not really)
+        ALU(data1, extended_value, ALUOp, ALUresult, Zero);
+        return 0;
+
+    }
+
+    return 1;
 }
 
 /* Read / Write Memory */
@@ -194,5 +231,10 @@ void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,
 /* 10 Points */
 void PC_update(unsigned jsec,unsigned extended_value,char Branch,char Jump,char Zero,unsigned *PC)
 {
+    *PC += 4;
 
+    if(Branch == 1 && Zero == 1) 
+		*PC += (extended_value << 2);
+    if(Jump == 1)
+        *PC = (*PC & 0xf0000000) | (jsec << 2);
 }
