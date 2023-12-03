@@ -181,7 +181,7 @@ int ALU_operations(unsigned data1,unsigned data2,unsigned extended_value,unsigne
     }
 
     else if ((ALUOp >= 0) && (ALUOp < 7)) {
-        //I-Type instruction (or J-type, but not really)
+        // i-type instruction
         ALU(data1, extended_value, ALUOp, ALUresult, Zero);
         return 0;
 
@@ -218,11 +218,11 @@ void write_register(unsigned r2,unsigned r3,unsigned memdata,unsigned ALUresult,
     if(RegWrite == 1) {
         if(MemtoReg == 1)
             Reg[r2] = memdata;
-        else if(MemtoReg == 0) {    // info to be stored is coming from register
+        else if(MemtoReg == 0) { // info to be stored is coming from register
             if(RegDst == 1)
-                Reg[r3] = ALUresult;    // regdst is 1 so instruction is r type meaning write to register r3
+                Reg[r3] = ALUresult; // regdst is 1 so instruction is r type meaning write to register r3
             else 
-                Reg[r2] = ALUresult;    // regdst is 0 so instruction is i type meaning write to register r2
+                Reg[r2] = ALUresult; // regdst is 0 so instruction is i type meaning write to register r2
         }
     }
 }
