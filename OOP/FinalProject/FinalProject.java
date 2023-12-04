@@ -189,6 +189,7 @@ public class FinalProject {
 	    } catch (NumberFormatException e) {
 	        option = -1;
 	    }
+		scanner.close();
 		return option;
 	}
 	
@@ -252,7 +253,7 @@ public class FinalProject {
 	
 	// method for printing to file
 	public static void writeToFile(ArrayList<Person> persons) {
-		File file = new File("C:/temp/report.txt");
+		File file = new File("report.txt");
 		try (PrintStream fileTxt = new PrintStream(file)) {
 			ArrayList<Person> facultys = new ArrayList<>();
 			ArrayList<Person> staffs = new ArrayList<>();
