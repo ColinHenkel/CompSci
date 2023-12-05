@@ -34,7 +34,7 @@ public class Lab3 {
 		}
 
 		// disjointset algorithm for closing nodes and checking connection
-		DisjointSet ds = new DisjointSet(N);
+		DS ds = new DS(N);
 		boolean[] isOpen = new boolean[N];
 		boolean[] result = new boolean[N];
 
@@ -65,13 +65,13 @@ public class Lab3 {
 }
 
 // class for disjoint set
-class DisjointSet {
+class DS {
 	int[] parent;
 	int[] height;
 	int numTrees;
 
 	// constructor for DisjointSet with given value n
-	public DisjointSet(int n) {
+	public DS(int n) {
 		parent = new int[n];
 		height = new int[n];
 		numTrees = n;
