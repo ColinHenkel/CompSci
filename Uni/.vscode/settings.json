@@ -1,0 +1,18 @@
+{
+    "java.project.sourcePaths": [
+        "CS2/Assignments/PA1",
+        "CS2/Assignments/PA2",
+        "CS2/Assignments/PA3",
+        "CS2/Assignments/PA4",
+        "CS2/Assignments/PA5",
+        "CS2/Assignments/PA6",
+        "CS2/Labs/Lab1",
+        "CS2/Labs/Lab2",
+        "CS2/Labs/Lab3",
+        "CS2/Labs/Lab4",
+        "CS2/Labs/Lab5",
+        "CS2/Labs/Lab6",
+        "CS2/Labs/Lab7",
+        "CS2/Labs/Lab8",
+    ]
+}
