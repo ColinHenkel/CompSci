@@ -1,9 +1,0 @@
-Report created on 2023-12-03
-Faculty Members
-1. Hatim Boustique ID: hb1234 Professor, Mathematics
-
-Staff Members
-1. Peter Griffin ID: pg1234 Mathematics, f
-
-Students (Sorted by GPA in descending order)
-1. Colin Henkel ID: ch1234 GPA: 3.87 Credit hours: 4
