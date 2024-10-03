@@ -1,9 +1,0 @@
-To begin my testing, I came up with two test cases that test individual aspects of the assignment that I wanted to ensure worked.
-My test_1.txt tests that the code is able to maximize its choices, making sure it's not just bouncing back and forth.
-My test_2.txt tests that the code will always follow the best path when all inputs are filled, as starting from the bottom 1 and taking the odd numbers
-is the maximized approach, which it does succesfully.
-
-test_1.txt correct output:
-22
-test_2.txt correct output:
-29
