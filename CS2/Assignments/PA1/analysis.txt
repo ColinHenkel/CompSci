@@ -1,0 +1,9 @@
+For the unsortedCandidatePair method, I created a HashSet, which has a time complexity of O(1).
+After this, I iterate through each point in the array A, which using a for:each loop has a time complexity of O(n).
+Inside this loop, in order to find the lower number within the candidate pairs, I run Math.abs, which has a time complexity of O(1), not affecting the loops time complexity.
+Therefore, the overall time complexity of the method is O(n), fulfilling the requirements specified within the assignment instructions.
+
+For the getCandidatePair method, I could not use a HashSet, therefore I began by initializng left and right, which point to the beginning and end of the array.
+Afterwards, I created a while loop that runs at MOST n times with n being the array length, and it searches by moving 'left' to the right or 'right to the left, guranteeing they will collide after n iterations, thus guranteeing a O(n) time complexity.
+Within the loop, the only functions performed are comparison, addition, and pair object construction, which all have a O(1) time complexity.
+Therefore, the overall time compexity of the method is also O(n), also fulfilling the requirements specified within the assignment instructions.
