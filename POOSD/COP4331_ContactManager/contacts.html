@@ -1,0 +1,101 @@
+<html>
+	<head>
+		<title>Contact Manager</title>
+		<script type="text/javascript" src="JS/main.js"></script>
+		<link href="CSS/style.css" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+	</head>
+
+	<body>
+		<h1 id="ContactTitle">Contact Manager</h1>
+		<div class="main-content">
+			<div class="logout" >
+				<button type="button" id="logoutButton" onclick="openLogOutModal()">Log out</button>
+			</div>
+			<div class="buttons-container">
+				<button type="button" id="addButton" onclick="openAddContactModal()">Add Contact</button>
+				<button type="button" id="deleteButton" onclick="openDeleteContactModal()">Delete Contact</button>
+				<button type="button" id="updateButton" onclick="openUpdateContactModal()">Update Contact</button>
+			</div>
+
+			<div class="contact-container">
+				<div class="top-nav">
+					<input type="search" id="searchBar" placeholder="Search contact here...">
+					<button type="button" id="searchButton" class="buttons" onclick="search();">Search</button>
+				</div>
+
+				<div class="contact-list" id="contactList"></div>
+			</div>
+		</div>
+
+		<!-- //This piece of code shows a display with the contact name and two buttons that can update ot delete a contact -->
+		<div id="contactModal" class="modal">
+			<div class="modal-content">
+				<span class="close" onclick="closeModal()">&times;</span>
+				<h2 id="contactName"></h2>
+				<p><strong>Email:</strong> <span id="contactEmail"></span></p>
+				<p><strong>Phone:</strong> <span id="contactPhone"></span></p>
+				<button class="buttons" onclick="openUpdateContactModal()">Update Contact</button>
+				<button class="buttons" onclick="deleteContactFromModal()">Delete Contact</button>
+			</div>
+		</div>
+
+
+		<!-- //This is a page where you can edit the contact  -->
+		<div id="editContactModal" class="modal">
+			<div class="modal-content">
+				<span class="close" onclick="closeEditContactModal()">&times;</span>
+				<h2>Edit Contact Information</h2>
+				<p><strong>First Name:</strong> <input type="text" id="editFirstName"></p>
+				<p><strong>Last Name:</strong> <input type="text" id="editLastName"></p>
+				<p><strong>New FirstName:</strong> <input type="text" id="editNewFirstName"></p>
+				<p><strong>New LastName:</strong> <input type="text" id="editNewLastName"></p>
+				<p><strong>Email:</strong> <input type="text" id="editContactEmail"></p>
+				<p><strong>Phone:</strong> <input type="text" id="editContactPhone"></p>
+				<button class="buttons"onclick="updateContact()">Save Changes</button>
+				<span id="updateResult"></span>
+			</div>
+		</div>
+
+		<div id="addContactModal" class="modal">
+			<div class="modal-content">
+				<span class="close" onclick="closeAddContactModal()">&times;</span>
+				<h2>Add New Contact</h2>
+				<p><strong>First Name:</strong> <input type="text" id="newContactFirstName"></p>
+				<p><strong>Last Name:</strong> <input type="text" id="newContactLastName"></p>
+				<p><strong>Email:</strong> <input type="text" id="newContactEmail"></p>
+				<p><strong>Phone:</strong> <input type="text" id="newContactPhone"></p>
+				<button class="buttons" onclick="addContact()">Add Contact</button>
+				<span id="addResult"></span>
+			</div>
+		</div>
+
+		<div id="logOutModal" class="modal">
+			<div class="modal-content">
+				<span class="close" onclick="closeLogOutModal()">&times</span>
+				<h2>Are you sure you want to log out?</h2>
+				<a href="login.html">
+				<button class="buttons">Yes</button>
+				</a>
+				<a href="contacts.html">
+				<button class="buttons">No</button>
+				</a>
+				<span id="logOutRusult"></span>
+			</div>
+		</div>
+
+		
+		<div id="deleteContactModal" class="modal">
+			<div class="modal-content">
+			<span class="close" onclick="closeDeleteContactModal()">&times</span>
+			<h2>Enter the Contact you want to delete</h2>
+			<p><strong>First Name:</strong> <input type="text" id="deleteContactFirstName"></p>
+			<p><strong>Last Name:</strong> <input type="text" id="deleteContactLastName"></p>
+			<button class="buttons" onclick="deleteContact()">Delete Contact</button>
+			<span id="deleteResult"></span>
+			</div>
+		</div>
+
+
+	</body>
+</html>
