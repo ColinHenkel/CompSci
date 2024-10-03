@@ -1,2 +1,2 @@
 # Contact Manager for Team 7 using the LAMP Stack
-My personal contribution was writing PHP (specifically DisplayContacts, UpdateContacts, and SearchContacts) and creating the MySQL database that hosted our users and contacts tables.
+My personal contributions were: writing the PHP for DisplayContacts, UpdateContacts, and SearchContacts, adding session functionality to track UserID to be accessed in appropriate PHP, and creating the MySQL database that we used on our instance.
