@@ -8,14 +8,30 @@
 #include "output.h"
 #include "common.h"
 
+// Condition variables and mutex
+pthread_cond_t insert_cv = PTHREAD_COND_INITIALIZER;
+pthread_cond_t delete_cv = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t cv_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+// State counters for tracking active inserts and deletes
+int active_inserts = 0;
+int active_deletes = 0;
+
 void *insert_thread(void *arg) {
     int thread_id = *(int*)arg;
     Command *cmd = &commands[thread_id];
+    uint64_t timestamp;
 
-    // Get timestamp
-    uint64_t timestamp = get_timestamp();
+    // Wait if there are other active insert threads
+    pthread_mutex_lock(&cv_mutex);
+    while (active_inserts > 0) {
+        pthread_cond_wait(&insert_cv, &cv_mutex);
+    }
+    active_inserts++;
+    pthread_mutex_unlock(&cv_mutex);
 
-    // Write command to output.txt
+    // Log after being awakened
+    timestamp = get_timestamp();
     write_command_to_output(timestamp, "INSERT", cmd->name, cmd->salary);
 
     // Acquire write lock
@@ -35,17 +51,35 @@ void *insert_thread(void *arg) {
     timestamp = get_timestamp();
     write_lock_event_to_output(timestamp, "WRITE LOCK RELEASED");
 
+    // Update and signal other waiting insert threads
+    pthread_mutex_lock(&cv_mutex);
+    active_inserts--;
+    pthread_cond_signal(&insert_cv);
+    pthread_mutex_unlock(&cv_mutex);
+
+    // // Log signaling insert
+    // timestamp = get_timestamp();
+    // write_condition_event_to_output(timestamp, "INSERT SIGNAL SENT");
+
     return NULL;
 }
 
 void *delete_thread(void *arg) {
     int thread_id = *(int*)arg;
     Command *cmd = &commands[thread_id];
+    uint64_t timestamp;
 
-    // Get timestamp
-    uint64_t timestamp = get_timestamp();
+    // Wait if there are other active delete threads
+    pthread_mutex_lock(&cv_mutex);
+    while (active_deletes > 0) {
+        pthread_cond_wait(&delete_cv, &cv_mutex);
+    }
+    active_deletes++;
+    pthread_mutex_unlock(&cv_mutex);
 
-    // Write command to output.txt
+    // Log after being awakened
+    timestamp = get_timestamp();
+    write_condition_event_to_output(timestamp, "DELETE AWAKENED");
     write_command_to_output(timestamp, "DELETE", cmd->name, 0);
 
     // Acquire write lock
@@ -65,14 +99,22 @@ void *delete_thread(void *arg) {
     timestamp = get_timestamp();
     write_lock_event_to_output(timestamp, "WRITE LOCK RELEASED");
 
+    // Update and signal other waiting delete threads
+    pthread_mutex_lock(&cv_mutex);
+    active_deletes--;
+    pthread_cond_signal(&delete_cv);
+    pthread_mutex_unlock(&cv_mutex);
+
+    // // Log signaling delete
+    // timestamp = get_timestamp();
+    // write_condition_event_to_output(timestamp, "DELETE SIGNAL SENT");
+
     return NULL;
 }
 
 void *search_thread(void *arg) {
     int thread_id = *(int*)arg;
     Command *cmd = &commands[thread_id];
-
-    // Get timestamp
     uint64_t timestamp = get_timestamp();
 
     // Write command to output.txt
@@ -106,7 +148,6 @@ void *search_thread(void *arg) {
 }
 
 void *print_thread(void *arg) {
-    // Get timestamp
     uint64_t timestamp = get_timestamp();
 
     // Write command to output.txt
