@@ -368,4 +368,104 @@ app.post('/api/create-set', async (req, res, next) => {
     res.status(200).json(ret);
 });
 
+app.post('/api/delete-exercise', async (req, res, next) => {
+    // Input: exerciseName (string)
+    // Output: success message or error
+
+    let error = '';
+
+    const {
+        exerciseName
+    } = req.body;
+
+    if (!exerciseName || exerciseName.trim() === '') {
+        error = 'Exercise name is required';
+        return res.status(400).json({
+            error
+        });
+    }
+
+    try {
+        const db = client.db();
+
+        // Find and delete the exercise by name (case-insensitive match)
+        const result = await db.collection('Exercises').deleteOne({
+            Name: {
+                $regex: '^' + exerciseName.trim() + '$',
+                $options: 'i'
+            }
+        });
+
+        if (result.deletedCount === 0) {
+            error = 'Exercise not found';
+            return res.status(404).json({
+                error
+            });
+        }
+
+        // Successful deletion
+        const ret = {
+            message: `Exercise "${exerciseName}" deleted successfully`,
+            error
+        };
+
+        res.status(200).json(ret);
+    } catch (e) {
+        error = e.toString();
+        res.status(500).json({
+            error
+        });
+    }
+});
+
+app.post('/api/delete-set', async (req, res, next) => {
+    // Input: setName (string)
+    // Output: success message or error
+
+    let error = '';
+
+    const {
+        setName
+    } = req.body;
+
+    if (!setName || setName.trim() === '') {
+        error = 'Set name is required';
+        return res.status(400).json({
+            error
+        });
+    }
+
+    try {
+        const db = client.db();
+
+        // Find and delete the set by name (case-insensitive match)
+        const result = await db.collection('Sets').deleteOne({
+            SetName: {
+                $regex: '^' + setName.trim() + '$',
+                $options: 'i'
+            }
+        });
+
+        if (result.deletedCount === 0) {
+            error = 'Set not found';
+            return res.status(404).json({
+                error
+            });
+        }
+
+        // Successful deletion
+        const ret = {
+            message: `Set "${setName}" deleted successfully`,
+            error
+        };
+
+        res.status(200).json(ret);
+    } catch (e) {
+        error = e.toString();
+        res.status(500).json({
+            error
+        });
+    }
+});
+
 app.listen(5000);
