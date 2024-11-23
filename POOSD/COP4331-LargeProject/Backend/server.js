@@ -389,9 +389,6 @@ app.post('/api/delete-exercise', async (req, res, next) => {
 });
 
 app.post('/api/delete-set', async (req, res, next) => {
-
-
-
     let error = '';
 
     const {
@@ -408,7 +405,6 @@ app.post('/api/delete-set', async (req, res, next) => {
     try {
         const db = client.db();
 
-
         const result = await db.collection('Sets').deleteOne({
             SetName: {
                 $regex: '^' + setName.trim() + '$',
@@ -422,7 +418,6 @@ app.post('/api/delete-set', async (req, res, next) => {
                 error
             });
         }
-
 
         const ret = {
             message: `Set "${setName}" deleted successfully`,
