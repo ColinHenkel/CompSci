@@ -29,46 +29,8 @@ app.use((req, res, next) => {
     next();
 });
 
-app.post('/api/login', async (req, res, next) => {
-    // input: Login, Password
-    // output: UserId, FirstName, LastName, error
-
-    var error = '';
-
-    const {
-        login,
-        password
-    } = req.body;
-
-    const db = client.db();
-    const results = await db.collection('Users').find({
-        Login: login,
-        Password: password
-    }).toArray();
-
-    var id = -1;
-    var fn = '';
-    var ln = '';
-
-    if (results.length > 0) {
-        id = results[0].UserId;
-        fn = results[0].FirstName;
-        ln = results[0].LastName;
-    }
-
-    var ret = {
-        id: id,
-        firstName: fn,
-        lastName: ln,
-        error: ''
-    };
-    res.status(200).json(ret);
-});
-
+//Creation
 app.post('/api/signup', async (req, res, next) => {
-    // input: FirstName, LastName, Login, Password
-    // output: error
-
     var error = '';
 
     const {
@@ -138,10 +100,72 @@ app.post('/api/create-exercise', async (req, res, next) => {
     res.status(200).json(ret);
 });
 
-app.post('/api/retrieve-exercise', async (req, res, next) => {
-    // input: search query
-    // output: exercise data, error
+app.post('/api/create-set', async (req, res, next) => {
+    let error = '';
 
+    const {
+        setName,
+        exercises,
+        userId
+    } = req.body;
+
+    const db = client.db();
+    const newSet = {
+        SetName: setName,
+        Exercises: exercises,
+        UserId: new ObjectId(userId)
+    };
+
+    try {
+        const result = await db.collection('Sets').insertOne(newSet);
+        if (!result.insertedId) {
+            error = 'Failed to create the set';
+        }
+    } catch (e) {
+        error = e.toString();
+    }
+
+    const ret = {
+        error: error
+    };
+    res.status(200).json(ret);
+});
+
+//Retrieval
+app.post('/api/login', async (req, res, next) => {
+    var error = '';
+
+    const {
+        login,
+        password
+    } = req.body;
+
+    const db = client.db();
+    const results = await db.collection('Users').find({
+        Login: login,
+        Password: password
+    }).toArray();
+
+    var id = -1;
+    var fn = '';
+    var ln = '';
+
+    if (results.length > 0) {
+        id = results[0].UserId;
+        fn = results[0].FirstName;
+        ln = results[0].LastName;
+    }
+
+    var ret = {
+        id: id,
+        firstName: fn,
+        lastName: ln,
+        error: ''
+    };
+    res.status(200).json(ret);
+});
+
+app.post('/api/retrieve-exercise', async (req, res, next) => {
     var error = '';
 
     const {
@@ -153,7 +177,6 @@ app.post('/api/retrieve-exercise', async (req, res, next) => {
     let results = [];
     try {
         const db = client.db();
-        // Perform search query in the database using regex for flexible search
         results = await db.collection('Exercises').find({
             "Name": {
                 $regex: _search + '.*',
@@ -187,10 +210,55 @@ app.post('/api/retrieve-exercise', async (req, res, next) => {
     res.status(200).json(ret);
 });
 
-app.post('/api/update-exercise', async (req, res, next) => {
-    // Input: name, muscleGroup, equipmentType
-    // Output: error
+app.post('/api/retrieve-set', async (req, res, next) => {
+    let error = '';
 
+    const {
+        setName
+    } = req.body;
+
+    if (!setName || setName.trim() === '') {
+        error = 'Set name is required';
+        return res.status(400).json({
+            error
+        });
+    }
+
+    try {
+        const db = client.db();
+
+        const result = await db.collection('Sets').findOne({
+            SetName: {
+                $regex: '^' + setName.trim() + '$',
+                $options: 'i'
+            }
+        });
+
+        if (!result) {
+            error = 'Set not found';
+            return res.status(404).json({
+                error
+            });
+        }
+
+        const ret = {
+            setName: result.SetName,
+            exercises: result.Exercises,
+            userId: result.UserId,
+            error
+        };
+
+        res.status(200).json(ret);
+    } catch (e) {
+        error = e.toString();
+        res.status(500).json({
+            error
+        });
+    }
+});
+
+//Update
+app.post('/api/update-exercise', async (req, res, next) => {
     let error = '';
 
     const {
@@ -205,18 +273,16 @@ app.post('/api/update-exercise', async (req, res, next) => {
         try {
             const db = client.db();
             const result = await db.collection('Exercises').updateOne({
-                    Name: {
-                        $regex: '^' + name + '$',
-                        $options: 'i'
-                    }
-                }, // Case-insensitive match for exact name
-                {
-                    $set: {
-                        MuscleGroup: muscleGroup,
-                        EquipmentType: equipmentType
-                    }
+                Name: {
+                    $regex: '^' + name + '$',
+                    $options: 'i'
                 }
-            );
+            }, {
+                $set: {
+                    MuscleGroup: muscleGroup,
+                    EquipmentType: equipmentType
+                }
+            });
 
             if (result.matchedCount === 0) {
                 error = 'Exercise not found';
@@ -235,9 +301,6 @@ app.post('/api/update-exercise', async (req, res, next) => {
 });
 
 app.post('/api/update-set', async (req, res, next) => {
-    // Input: setName, newSetName, exercises (Array)
-    // Output: error
-
     let error = '';
 
     const {
@@ -252,18 +315,16 @@ app.post('/api/update-set', async (req, res, next) => {
         try {
             const db = client.db();
             const result = await db.collection('Sets').updateOne({
-                    SetName: {
-                        $regex: '^' + setName + '$',
-                        $options: 'i'
-                    }
-                }, // Case-insensitive match for exact name
-                {
-                    $set: {
-                        SetName: newSetName,
-                        Exercises: exercises
-                    }
+                SetName: {
+                    $regex: '^' + setName + '$',
+                    $options: 'i'
                 }
-            );
+            }, {
+                $set: {
+                    SetName: newSetName,
+                    Exercises: exercises
+                }
+            });
 
             if (result.matchedCount === 0) {
                 error = 'Set not found';
@@ -281,97 +342,8 @@ app.post('/api/update-set', async (req, res, next) => {
     res.status(200).json(ret);
 });
 
-app.post('/api/retrieve-set', async (req, res, next) => {
-    // Input: setName (string)
-    // Output: set data (name, exercises, userId), error
-
-    let error = '';
-
-    const {
-        setName
-    } = req.body;
-
-    if (!setName || setName.trim() === '') {
-        error = 'Set name is required';
-        return res.status(400).json({
-            error
-        });
-    }
-
-    try {
-        const db = client.db();
-
-        // Search for the set by name (case-insensitive match)
-        const result = await db.collection('Sets').findOne({
-            SetName: {
-                $regex: '^' + setName.trim() + '$',
-                $options: 'i'
-            }
-        });
-
-        if (!result) {
-            error = 'Set not found';
-            return res.status(404).json({
-                error
-            });
-        }
-
-        // If set is found, return its details
-        const ret = {
-            setName: result.SetName,
-            exercises: result.Exercises,
-            userId: result.UserId,
-            error
-        };
-
-        res.status(200).json(ret);
-    } catch (e) {
-        error = e.toString();
-        res.status(500).json({
-            error
-        });
-    }
-});
-
-app.post('/api/create-set', async (req, res, next) => {
-    // Input: SetName, Exercises (Array), UserId
-    // Output: error
-
-    let error = '';
-
-    const {
-        setName,
-        exercises,
-        userId
-    } = req.body;
-
-    const db = client.db();
-    const newSet = {
-        SetName: setName,
-        Exercises: exercises,
-        UserId: new ObjectId(userId)
-    };
-
-    try {
-
-        const result = await db.collection('Sets').insertOne(newSet);
-        if (!result.insertedId) {
-            error = 'Failed to create the set';
-        }
-    } catch (e) {
-        error = e.toString();
-    }
-
-    const ret = {
-        error: error
-    };
-    res.status(200).json(ret);
-});
-
+//Deletion
 app.post('/api/delete-exercise', async (req, res, next) => {
-    // Input: exerciseName (string)
-    // Output: success message or error
-
     let error = '';
 
     const {
@@ -388,7 +360,6 @@ app.post('/api/delete-exercise', async (req, res, next) => {
     try {
         const db = client.db();
 
-        // Find and delete the exercise by name (case-insensitive match)
         const result = await db.collection('Exercises').deleteOne({
             Name: {
                 $regex: '^' + exerciseName.trim() + '$',
@@ -403,7 +374,6 @@ app.post('/api/delete-exercise', async (req, res, next) => {
             });
         }
 
-        // Successful deletion
         const ret = {
             message: `Exercise "${exerciseName}" deleted successfully`,
             error
@@ -419,8 +389,8 @@ app.post('/api/delete-exercise', async (req, res, next) => {
 });
 
 app.post('/api/delete-set', async (req, res, next) => {
-    // Input: setName (string)
-    // Output: success message or error
+
+
 
     let error = '';
 
@@ -438,7 +408,7 @@ app.post('/api/delete-set', async (req, res, next) => {
     try {
         const db = client.db();
 
-        // Find and delete the set by name (case-insensitive match)
+
         const result = await db.collection('Sets').deleteOne({
             SetName: {
                 $regex: '^' + setName.trim() + '$',
@@ -453,7 +423,7 @@ app.post('/api/delete-set', async (req, res, next) => {
             });
         }
 
-        // Successful deletion
+
         const ret = {
             message: `Set "${setName}" deleted successfully`,
             error
