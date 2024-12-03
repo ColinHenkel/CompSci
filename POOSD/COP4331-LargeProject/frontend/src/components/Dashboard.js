@@ -23,6 +23,24 @@ const HomePage = () => {
   const [cardioExercises, setCardioExercises] = useState([]);
   const [cardioHistory, setCardioHistory] = useState([]);
   const [isEditingWorkout, setIsEditingWorkout] = useState(null); // Track if editing a workout
+    
+  // load data from localStorage on mount
+  useEffect(() => {
+    const savedWorkoutHistory = JSON.parse(localStorage.getItem("workoutHistory")) || [];
+    setWorkoutHistory(savedWorkoutHistory);
+  
+    const savedCardioHistory = JSON.parse(localStorage.getItem("cardioHistory")) || [];
+    setCardioHistory(savedCardioHistory);
+  }, []);
+  
+  // save data to localStorage on state change
+  useEffect(() => {
+    localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
+  }, [workoutHistory]);
+  
+  useEffect(() => {
+    localStorage.setItem("cardioHistory", JSON.stringify(cardioHistory));
+  }, [cardioHistory]);
 
   const signOut = () => {
     localStorage.removeItem("user_data");
