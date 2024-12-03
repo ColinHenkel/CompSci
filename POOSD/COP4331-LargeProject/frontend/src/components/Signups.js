@@ -6,7 +6,7 @@ function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstname, setFirstName] = useState('');
-  const [lastname, setlastName] = useState('');
+  const [lastname, setLastName] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showModal, setShowModal] = useState(false); // Modal visibility state
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ function Signup() {
     var js = JSON.stringify(obj);
 
     try {
-      const response = await fetch('http://localhost:5000/api/signup', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+      const response = await fetch('https://largeproject.mattct027.xyz/api/signup', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
 
       var res = JSON.parse(await response.text());
 
@@ -52,14 +52,14 @@ function Signup() {
       <form onSubmit={handleSignup}>
       <input
           type="firstname"
-          placeholder="John"
+          placeholder="First Name"
           value={firstname}
           onChange={(e) => setFirstName(e.target.value)}
           required
         />
         <input
           type="lastname"
-          placeholder="Doe"
+          placeholder="Last Name"
           value={lastname}
           onChange={(e) => setLastName(e.target.value)}
           required

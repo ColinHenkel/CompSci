@@ -17,20 +17,18 @@ function Login() {
     var js = JSON.stringify(obj);
 
     try {
-      const response = await fetch('http://localhost:5000/api/login', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+      const response = await fetch('https://largeproject.mattct027.xyz/api/login', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
 
       var res = JSON.parse(await response.text());
 
-      if (res.id > 0) {
+      if (res.id < 0) {
+        setShowErrorModal(true);
+      }
+      else {
         var user = {firstName:res.firstName,lastName:res.lastName,id:res.id}
         localStorage.setItem('user_data', JSON.stringify(user));
 
-        setMessage('');
-
         setShowSuccessModal(true); // Valid login, show success modal
-      }
-      else {
-        setShowErrorModal(true); // Invalid login, show error modal
       }
     }
     catch (e) {

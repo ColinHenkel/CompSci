@@ -68,7 +68,7 @@ const HomePage = () => {
     var js = JSON.stringify(obj);
 
     try {
-      const response = await fetch('http://localhost:5000/api/create-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+      const response = await fetch('https://largeproject.mattct027.xyz/api/create-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
 
       var res = JSON.parse(await response.text());
 
@@ -96,7 +96,7 @@ const HomePage = () => {
       var js = JSON.stringify(obj);
 
       try {
-        const response = await fetch('http://localhost:5000/api/delete-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+        const response = await fetch('https://largeproject.mattct027.xyz/api/delete-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
   
         var res = JSON.parse(await response.text());
   
@@ -131,7 +131,7 @@ const HomePage = () => {
     var js = JSON.stringify(obj);
 
     try {
-      const response = await fetch('http://localhost:5000/api/update-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+      const response = await fetch('https://largeproject.mattct027.xyz/api/update-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
 
       var res = JSON.parse(await response.text());
 
@@ -171,7 +171,7 @@ const HomePage = () => {
     setCurrentEquipmentType("");
 
     try {
-      const response = await fetch('http://localhost:5000/api/create-exercise', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+      const response = await fetch('https://largeproject.mattct027.xyz/api/create-exercise', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
 
       var res = JSON.parse(await response.text());
 
@@ -244,7 +244,7 @@ const HomePage = () => {
     var js = JSON.stringify(obj);
 
     try {
-      const response = await fetch('http://localhost:5000/api/create-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+      const response = await fetch('https://largeproject.mattct027.xyz/api/create-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
 
       var res = JSON.parse(await response.text());
 
@@ -272,7 +272,7 @@ const HomePage = () => {
       var js = JSON.stringify(obj);
 
       try {
-        const response = await fetch('http://localhost:5000/api/delete-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+        const response = await fetch('https://largeproject.mattct027.xyz/api/delete-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
 
         var res = JSON.parse(await response.text());
 
@@ -307,7 +307,7 @@ const HomePage = () => {
     var js = JSON.stringify(obj);
 
     try {
-      const response = await fetch('http://localhost:5000/api/update-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+      const response = await fetch('https://largeproject.mattct027.xyz/api/update-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
 
       var res = JSON.parse(await response.text());
 
@@ -347,7 +347,7 @@ const HomePage = () => {
     setCurrentEquipmentType("");
 
     try {
-      const response = await fetch('http://localhost:5000/api/create-exercise', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+      const response = await fetch('https://largeproject.mattct027.xyz/api/create-exercise', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
 
       var res = JSON.parse(await response.text());
 

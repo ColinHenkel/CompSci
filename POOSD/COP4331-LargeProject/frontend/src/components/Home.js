@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/Home.css';
+import gymImage from './pictures/Clean.png';
 
 function Home() {
   return (
@@ -27,11 +28,12 @@ function Home() {
         {/* Image Section */}
         <div className="image-content">
           <img
-            src="https://via.placeholder.com/600x400"
+            src={gymImage}
             alt="Fitness Dashboard"
             className="dashboard-image"
           />
-        </div>
+  </div>
+
       </main>
     </div>
   );
