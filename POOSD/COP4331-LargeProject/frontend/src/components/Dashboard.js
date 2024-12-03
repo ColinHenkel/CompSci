@@ -1,436 +1,583 @@
-import React, { useState } from "react";
+import React, {
+  useState,
+  useEffect
+} from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "../styles/Dashboard.css";
 import Home from "./Home";
 
 const HomePage = () => {
-  const [activeTab, setActiveTab] = useState("Dashboard");
-  const [isSignedOut, setIsSignedOut] = useState(false);
-  const [workoutDates, setWorkoutDates] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [startingWeight, setStartingWeight] = useState(70);
-  const [currentUserWeight, setCurrentUserWeight] = useState(70);
-  const [newWeightInput, setNewWeightInput] = useState("");
-  const [workoutInProgress, setWorkoutInProgress] = useState(false);
-  const [workoutStartTime, setWorkoutStartTime] = useState(new Date());
-  const [exercises, setExercises] = useState([]);
-  const [currentExercise, setCurrentExercise] = useState("");
-  const [currentMuscleGroup, setCurrentMuscleGroup] = useState("");
-  const [currentEquipmentType, setCurrentEquipmentType] = useState("");
-  const [notes, setNotes] = useState("");
-  const [workoutHistory, setWorkoutHistory] = useState([]);
-  const [cardioExercises, setCardioExercises] = useState([]);
-  const [cardioHistory, setCardioHistory] = useState([]);
-  const [isEditingWorkout, setIsEditingWorkout] = useState(null); // Track if editing a workout
-    
-  // load data from localStorage on mount
-  useEffect(() => {
-    const savedWorkoutHistory = JSON.parse(localStorage.getItem("workoutHistory")) || [];
-    setWorkoutHistory(savedWorkoutHistory);
-  
-    const savedCardioHistory = JSON.parse(localStorage.getItem("cardioHistory")) || [];
-    setCardioHistory(savedCardioHistory);
-  }, []);
-  
-  // save data to localStorage on state change
-  useEffect(() => {
-    localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
-  }, [workoutHistory]);
-  
-  useEffect(() => {
-    localStorage.setItem("cardioHistory", JSON.stringify(cardioHistory));
-  }, [cardioHistory]);
+      const [activeTab, setActiveTab] = useState("Dashboard");
+      const [isSignedOut, setIsSignedOut] = useState(false);
+      const [workoutDates, setWorkoutDates] = useState([]);
+      const [selectedDate, setSelectedDate] = useState(new Date());
+      const [startingWeight, setStartingWeight] = useState(70);
+      const [currentUserWeight, setCurrentUserWeight] = useState(70);
+      const [newWeightInput, setNewWeightInput] = useState("");
+      const [workoutInProgress, setWorkoutInProgress] = useState(false);
+      const [workoutStartTime, setWorkoutStartTime] = useState(new Date());
+      const [exercises, setExercises] = useState([]);
+      const [currentExercise, setCurrentExercise] = useState("");
+      const [currentMuscleGroup, setCurrentMuscleGroup] = useState("");
+      const [currentEquipmentType, setCurrentEquipmentType] = useState("");
+      const [notes, setNotes] = useState("");
+      const [workoutHistory, setWorkoutHistory] = useState([]);
+      const [cardioExercises, setCardioExercises] = useState([]);
+      const [cardioHistory, setCardioHistory] = useState([]);
+      const [isEditingWorkout, setIsEditingWorkout] = useState(null); // Track if editing a workout
 
-  const signOut = () => {
-    localStorage.removeItem("user_data");
-    setIsSignedOut(true);
-  };
 
-  const handleTabClick = (tab) => {
-    setActiveTab(tab);
-  };
+      // load data from localStorage on mount
+      useEffect(() => {
+          const savedWorkoutHistory = JSON.parse(localStorage.getItem("workoutHistory")) || [];
+          setWorkoutHistory(savedWorkoutHistory);
 
-  const handleDateClick = (date) => {
-    const dateString = date.toDateString();
-    if (!workoutDates.includes(dateString)) {
-      setWorkoutDates([...workoutDates, dateString]);
-    } else {
-      setWorkoutDates(workoutDates.filter((d) => d !== dateString));
-    }
-  };
 
-  const handleStartingWeightUpdate = () => {
-    if (newWeightInput) {
-      setStartingWeight(Number(newWeightInput));
-      setCurrentUserWeight(Number(newWeightInput));
-      setNewWeightInput("");
-    }
-  };
+          const savedCardioHistory = JSON.parse(localStorage.getItem("cardioHistory")) || [];
+          setCardioHistory(savedCardioHistory);
+      }, []);
 
-  const handleCurrentWeightUpdate = () => {
-    if (newWeightInput) {
-      setCurrentUserWeight(Number(newWeightInput));
-      setNewWeightInput("");
-    }
-  };
+      // save data to localStorage on state change
+      useEffect(() => {
+          localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
+      }, [workoutHistory]);
 
-  const handleStartWorkout = async (e) => {
-    e.preventDefault();
-    setWorkoutInProgress(true);
-    setWorkoutStartTime(new Date());
-    setExercises([]);
-    setNotes("");
+      useEffect(() => {
+          localStorage.setItem("cardioHistory", JSON.stringify(cardioHistory));
+      }, [cardioHistory]);
 
-    var obj = {setName:"NewWeightTraining", exercises:exercises, userId:JSON.parse(localStorage.getItem('user_data')).id}; 
-    var js = JSON.stringify(obj);
+      useEffect(() => {
+          const savedStartingWeight = localStorage.getItem("startingWeight");
+          const savedCurrentUserWeight = localStorage.getItem("currentUserWeight");
 
-    try {
-      const response = await fetch('https://largeproject.mattct027.xyz/api/create-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+          if (savedStartingWeight) setStartingWeight(Number(savedStartingWeight));
+          if (savedCurrentUserWeight) setCurrentUserWeight(Number(savedCurrentUserWeight));
+      }, []);
 
-      var res = JSON.parse(await response.text());
+      useEffect(() => {
+          localStorage.setItem("startingWeight", startingWeight);
+      }, [startingWeight]);
 
-      if (res.error.length <= 0) {
-        // Workout/set successfully created
-      }
-      else {
-        alert(res.error);
-      }
-    }
-    catch {
-      alert(e.toString);
-    }
-  };
+      useEffect(() => {
+          // Save currentUserWeight to localStorage when it changes
+          localStorage.setItem("currentUserWeight", currentUserWeight);
+      }, [currentUserWeight]);
 
-  const handleCancelWorkout = async (e) => {
-    e.preventDefault();
-    if (window.confirm("Are you sure you want to cancel this workout? All progress will be lost.")) {
-      setWorkoutInProgress(false);
-      setExercises([]);
-      setWorkoutStartTime(new Date());
-      setNotes("");
+      const handleStartingWeightUpdate = () => {
+          if (newWeightInput) {
+              setStartingWeight(Number(newWeightInput));
+              setCurrentUserWeight(Number(newWeightInput));
+              setNewWeightInput("");
+          }
+      };
 
-      var obj = {setName:"NewWeightTraining"}; 
-      var js = JSON.stringify(obj);
+      const handleCurrentWeightUpdate = () => {
+          if (newWeightInput) {
+              setCurrentUserWeight(Number(newWeightInput));
+              setNewWeightInput("");
+          }
+      };
 
-      try {
-        const response = await fetch('https://largeproject.mattct027.xyz/api/delete-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
-  
-        var res = JSON.parse(await response.text());
-  
-        if (res.error.length <= 0) {
-          // Workout/set successfully deleted
-          alert(res.message);
-        }
-        else {
-          alert(res.error);
-        }
-      }
-      catch {
-        alert(e.toString);
-      }
-    }
-  };
-
-  const handleFinishWorkout = async (e) => {
-    e.preventDefault();
-    const completedWorkout = {
-      time: workoutStartTime,
-      exercises,
-      notes,
-    };
-    setWorkoutHistory([...workoutHistory, completedWorkout]);
-    alert("Workout completed!");
-    setWorkoutInProgress(false);
-    setWorkoutStartTime(new Date());
-    setNotes("");
-
-    var obj = {setName:"NewWeightTraining", newSetName:"FinishedWeightTraining", exercises:exercises}; 
-    var js = JSON.stringify(obj);
-
-    try {
-      const response = await fetch('https://largeproject.mattct027.xyz/api/update-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
-
-      var res = JSON.parse(await response.text());
-
-      if (res.error.length <= 0) {
-        // Workout/set successfully updated
-      }
-      else {
-        alert(res.error);
-      }
-    }
-    catch {
-      alert(e.toString);
-    }
-
-    setExercises([]);
-  };
-
-  const handleAddExercise = async (e) => {
-    e.preventDefault();
-    if (!currentExercise.trim()) {
-      alert("Please enter an exercise name.");
-      return;
-    }
-    setExercises([
-      ...exercises,
-      {
-        name: currentExercise.trim(),
-        sets: [],
-      },
-    ]);
-
-    var obj = {name:currentExercise.trim(), muscleGroup:currentMuscleGroup.trim(), equipmentType:currentEquipmentType.trim()};
-    var js = JSON.stringify(obj);
-
-    setCurrentExercise("");
-    setCurrentMuscleGroup("");
-    setCurrentEquipmentType("");
-
-    try {
-      const response = await fetch('https://largeproject.mattct027.xyz/api/create-exercise', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
-
-      var res = JSON.parse(await response.text());
-
-      if (res.error.length <= 0) {
-        // Add Exercise is successful
-      }
-      else {
-        alert(res.error);
-      }
-    }
-    catch{
-      alert(e.toString());
-    }
-  };
-
-  const handleAddSet = (exerciseIndex) => {
-    const updatedExercises = [...exercises];
-    updatedExercises[exerciseIndex].sets.push({ weight: "", reps: "" });
-    setExercises(updatedExercises);
-  };
-
-  const handleDeleteSet = (exerciseIndex, setIndex) => {
-    const updatedExercises = [...exercises];
-    updatedExercises[exerciseIndex].sets.splice(setIndex, 1);
-    setExercises(updatedExercises);
-  };
-
-  const handleUpdateSet = (exerciseIndex, setIndex, field, value) => {
-    const updatedExercises = [...exercises];
-    updatedExercises[exerciseIndex].sets[setIndex][field] = value;
-    setExercises(updatedExercises);
-  };
-
-  const handleEditWorkout = (index) => {
-    const workoutToEdit = workoutHistory[index];
-    setWorkoutInProgress(true);
-    setWorkoutStartTime(workoutToEdit.time);
-    setExercises(workoutToEdit.exercises);
-    setNotes(workoutToEdit.notes);
-    setIsEditingWorkout(index); // Set editing index
-  };
-
-  const handleSaveEditedWorkout = () => {
-    const updatedHistory = [...workoutHistory];
-    updatedHistory[isEditingWorkout] = {
-      time: workoutStartTime,
-      exercises,
-      notes,
-    };
-    setWorkoutHistory(updatedHistory);
-    setIsEditingWorkout(null); // Clear editing index
-    setWorkoutInProgress(false);
-    alert("Workout updated successfully!");
-  };
-
-  const handleEditWorkoutTime = (index, newTime) => {
-    const updatedHistory = [...workoutHistory];
-    updatedHistory[index].time = new Date(newTime);
-    setWorkoutHistory(updatedHistory);
-  };
-
-  const handleStartCardioWorkout = async (e) => {
-    e.preventDefault();
-    setWorkoutInProgress(true);
-    setWorkoutStartTime(new Date());
-    setCardioExercises([]); // Reset cardio-specific exercises
-    setNotes("");
-
-    var obj = {setName:"NewCardio", exercises:cardioExercises, userId:JSON.parse(localStorage.getItem('user_data')).id}; 
-    var js = JSON.stringify(obj);
-
-    try {
-      const response = await fetch('https://largeproject.mattct027.xyz/api/create-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
-
-      var res = JSON.parse(await response.text());
-
-      if (res.error.length <= 0) {
-        // Workout/set successfully created
-      }
-      else {
-        alert(res.error);
-      }
-    }
-    catch{
-      alert(e.toString);
-    }
-  };
-
-  const handleCancelCardioWorkout = async(e) => {
-    e.preventDefault();
-    if (window.confirm("Are you sure you want to cancel this workout? All progress will be lost.")) {
-      setWorkoutInProgress(false);
-      setCardioExercises([]); // Reset cardio-specific exercises
-      setWorkoutStartTime(new Date());
-      setNotes("");
-
-      var obj = {setName:"NewCardio"}; 
-      var js = JSON.stringify(obj);
-
-      try {
-        const response = await fetch('https://largeproject.mattct027.xyz/api/delete-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
-
-        var res = JSON.parse(await response.text());
-
-        if (res.error.length <= 0) {
-          // Workout/set successfully deleted
-          alert(res.message);
-        }
-        else {
-          alert(res.error);
-        }
-      }
-      catch{
-        alert(e.toString);
-      }
-    }
-  };
-
-  const handleFinishCardioWorkout = async (e) => {
-    e.preventDefault();
-    const completedWorkout = {
-      time: workoutStartTime,
-      exercises: cardioExercises,
-      notes,
-    };
-    setCardioHistory([...cardioHistory, completedWorkout]); // Save to cardio-specific history
-    alert("Cardio workout completed!");
-    setWorkoutInProgress(false);
-    setWorkoutStartTime(new Date());
-    setNotes("");
-
-    var obj = {setName:"NewCardio", newSetName:"FinishedCardio", exercises:cardioExercises}; 
-    var js = JSON.stringify(obj);
-
-    try {
-      const response = await fetch('https://largeproject.mattct027.xyz/api/update-set', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
-
-      var res = JSON.parse(await response.text());
-
-      if (res.error.length <= 0) {
-        // Cardio workout/set successfully updated
-      }
-      else {
-        alert(res.error);
-      }
-    }
-    catch {
-      alert(e.toString);
-    }
-
-    setCardioExercises([]); // Clear cardio-specific exercises
-  };
-
-  const handleAddCardioExercise = async (e) => {
-    e.preventDefault();
-    if (!currentExercise.trim()) {
-      alert("Please enter an exercise name.");
-      return;
-    }
-    setCardioExercises([
-      ...cardioExercises,
-      {
-        name: currentExercise.trim(),
-        sets: [],
-      },
-    ]);
-    
-    var obj = {name:currentExercise.trim(), muscleGroup:currentMuscleGroup.trim(), equipmentType:currentEquipmentType.trim()};
-    var js = JSON.stringify(obj);
-
-    setCurrentExercise("");
-    setCurrentMuscleGroup("");
-    setCurrentEquipmentType("");
-
-    try {
-      const response = await fetch('https://largeproject.mattct027.xyz/api/create-exercise', {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
-
-      var res = JSON.parse(await response.text());
-
-      if (res.error.length <= 0) {
-        // Add Cardio Exercise is successful
-      }
-      else {
-        alert(res.error);
-      }
-    }
-    catch{
-      alert(e.toString());
-    }
-  };
-
-  const handleAddCardioSet = (exerciseIndex) => {
-    const updatedExercises = [...cardioExercises];
-    updatedExercises[exerciseIndex].sets.push({ time: "", distance: "" });
-    setCardioExercises(updatedExercises);
-  };
-
-  const handleDeleteCardioSet = (exerciseIndex, setIndex) => {
-    const updatedExercises = [...cardioExercises];
-    updatedExercises[exerciseIndex].sets.splice(setIndex, 1);
-    setCardioExercises(updatedExercises);
-  };
-
-  const handleUpdateCardioSet = (exerciseIndex, setIndex, field, value) => {
-    const updatedExercises = [...cardioExercises];
-    updatedExercises[exerciseIndex].sets[setIndex][field] = value;
-    setCardioExercises(updatedExercises);
-  };  
-
-  const handleEditCardioWorkout = (index) => {
-    const workoutToEdit = cardioHistory[index];
-    setWorkoutInProgress(true);
-    setWorkoutStartTime(workoutToEdit.time);
-    setCardioExercises(workoutToEdit.exercises);
-    setNotes(workoutToEdit.notes);
-    setIsEditingWorkout(index); // Set editing index
-  };
-  
-  const handleSaveEditedCardioWorkout = () => {
-    const updatedHistory = [...cardioHistory];
-    updatedHistory[isEditingWorkout] = {
-      time: workoutStartTime,
-      exercises: cardioExercises,
-      notes,
-    };
-    setCardioHistory(updatedHistory);
-    setIsEditingWorkout(null); // Clear editing index
-    setWorkoutInProgress(false);
-    alert("Cardio workout updated successfully!");
-  };
-  
-  const handleEditCardioWorkoutTime = (index, newTime) => {
-    const updatedHistory = [...cardioHistory];
-    updatedHistory[index].time = new Date(newTime);
-    setCardioHistory(updatedHistory);
-  };  
-  
-  if (isSignedOut) {
-    return <Home />;
+      /*  useEffect(() => {
+const handleStorageChange = (event) => {
+  if (event.key === "startingWeight") {
+    setStartingWeight(Number(event.newValue));
+  } else if (event.key === "currentUserWeight") {
+    setCurrentUserWeight(Number(event.newValue));
   }
+};
 
+window.addEventListener("storage", handleStorageChange);
+return () => window.removeEventListener("storage", handleStorageChange);
+}, []);*/
+      /*useEffect(() => {
+const savedStartingWeight = Number(localStorage.getItem("startingWeight")) || 70; // Default 70
+setStartingWeight(savedStartingWeight);
+
+const savedCurrentUserWeight = Number(localStorage.getItem("currentUserWeight")) || 70; // Default 70
+setCurrentUserWeight(savedCurrentUserWeight);
+
+const savedNewWeightInput = localStorage.getItem("newWeightInput") || "";
+setNewWeightInput(savedNewWeightInput);
+}, []); */
+
+      const signOut = () => {
+          localStorage.removeItem("user_data");
+          setIsSignedOut(true);
+      };
+
+      const handleTabClick = (tab) => {
+          setActiveTab(tab);
+      };
+
+      const handleDateClick = (date) => {
+          const dateString = date.toDateString();
+          if (!workoutDates.includes(dateString)) {
+              setWorkoutDates([...workoutDates, dateString]);
+          } else {
+              setWorkoutDates(workoutDates.filter((d) => d !== dateString));
+          }
+      };
+
+      /* const handleStartingWeightUpdate = () => {
+         if (newWeightInput) {
+           setStartingWeight(Number(newWeightInput));
+           setCurrentUserWeight(Number(newWeightInput));
+           setNewWeightInput("");
+         }
+       };
+
+       const handleCurrentWeightUpdate = () => {
+         if (newWeightInput) {
+           setCurrentUserWeight(Number(newWeightInput));
+           setNewWeightInput("");
+         }
+       };
+       */
+      /* const handleStartingWeightUpdate = () => {
+        if (newWeightInput) {
+          const updatedWeight = Number(newWeightInput);
+          setStartingWeight(updatedWeight);
+          setCurrentUserWeight(updatedWeight);
+          localStorage.setItem("startingWeight", updatedWeight);
+          localStorage.setItem("currentUserWeight", updatedWeight);
+          setNewWeightInput("");
+        }
+      };
+
+      // Update Current Weight
+      const handleCurrentWeightUpdate = () => {
+        if (newWeightInput) {
+          const updatedWeight = Number(newWeightInput);
+          setCurrentUserWeight(updatedWeight);
+          localStorage.setItem("currentUserWeight", updatedWeight);
+          setNewWeightInput("");
+        }
+      };*/
+
+      const handleStartWorkout = async (e) => {
+          e.preventDefault();
+          setWorkoutInProgress(true);
+          setWorkoutStartTime(new Date());
+          setExercises([]);
+          setNotes("");
+
+          var obj = {
+              setName: "NewWeightTraining",
+              exercises: exercises,
+              userId: JSON.parse(localStorage.getItem('user_data')).id
+          };
+          var js = JSON.stringify(obj);
+
+          try {
+              const response = await fetch('https://largeproject.mattct027.xyz/api/create-set', {
+                  method: 'POST',
+                  body: js,
+                  headers: {
+                      'Content-Type': 'application/json'
+                  }
+              });
+
+              var res = JSON.parse(await response.text());
+
+              if (res.error.length <= 0) {
+                  // Workout/set successfully created
+              } else {
+                  alert(res.error);
+              }
+          } catch {
+              alert(e.toString);
+          }
+      };
+
+      const handleCancelWorkout = async (e) => {
+          e.preventDefault();
+          if (window.confirm("Are you sure you want to cancel this workout? All progress will be lost.")) {
+              setWorkoutInProgress(false);
+              setExercises([]);
+              setWorkoutStartTime(new Date());
+              setNotes("");
+
+              var obj = {
+                  setName: "NewWeightTraining"
+              };
+              var js = JSON.stringify(obj);
+
+              try {
+                  const response = await fetch('https://largeproject.mattct027.xyz/api/delete-set', {
+                      method: 'POST',
+                      body: js,
+                      headers: {
+                          'Content-Type': 'application/json'
+                      }
+                  });
+
+                  var res = JSON.parse(await response.text());
+
+                  if (res.error.length <= 0) {
+                      // Workout/set successfully deleted
+                      alert(res.message);
+                  } else {
+                      alert(res.error);
+                  }
+              } catch {
+                  alert(e.toString);
+              }
+          }
+      };
+
+      const handleFinishWorkout = async (e) => {
+          e.preventDefault();
+          const completedWorkout = {
+              time: workoutStartTime,
+              exercises,
+              notes,
+          };
+          setWorkoutHistory([...workoutHistory, completedWorkout]);
+          alert("Workout completed!");
+          setWorkoutInProgress(false);
+          setWorkoutStartTime(new Date());
+          setNotes("");
+
+          var obj = {
+              setName: "NewWeightTraining",
+              newSetName: "FinishedWeightTraining",
+              exercises: exercises
+          };
+          var js = JSON.stringify(obj);
+
+          try {
+              const response = await fetch('https://largeproject.mattct027.xyz/api/update-set', {
+                  method: 'POST',
+                  body: js,
+                  headers: {
+                      'Content-Type': 'application/json'
+                  }
+              });
+
+              var res = JSON.parse(await response.text());
+
+              if (res.error.length <= 0) {
+                  // Workout/set successfully updated
+              } else {
+                  alert(res.error);
+              }
+          } catch {
+              alert(e.toString);
+          }
+
+          setExercises([]);
+      };
+
+      const handleAddExercise = async (e) => {
+          e.preventDefault();
+          if (!currentExercise.trim()) {
+              alert("Please enter an exercise name.");
+              return;
+          }
+          setExercises([
+              ...exercises,
+              {
+                  name: currentExercise.trim(),
+                  sets: [],
+              },
+          ]);
+
+          var obj = {
+              name: currentExercise.trim(),
+              muscleGroup: currentMuscleGroup.trim(),
+              equipmentType: currentEquipmentType.trim()
+          };
+          var js = JSON.stringify(obj);
+
+          setCurrentExercise("");
+          setCurrentMuscleGroup("");
+          setCurrentEquipmentType("");
+
+          try {
+              const response = await fetch('https://largeproject.mattct027.xyz/api/create-exercise', {
+                  method: 'POST',
+                  body: js,
+                  headers: {
+                      'Content-Type': 'application/json'
+                  }
+              });
+
+              var res = JSON.parse(await response.text());
+
+              if (res.error.length <= 0) {
+                  // Add Exercise is successful
+              } else {
+                  alert(res.error);
+              }
+          } catch {
+              alert(e.toString());
+          }
+      };
+
+      const handleAddSet = (exerciseIndex) => {
+          const updatedExercises = [...exercises];
+          updatedExercises[exerciseIndex].sets.push({
+              weight: "",
+              reps: ""
+          });
+          setExercises(updatedExercises);
+      };
+
+      const handleDeleteSet = (exerciseIndex, setIndex) => {
+          const updatedExercises = [...exercises];
+          updatedExercises[exerciseIndex].sets.splice(setIndex, 1);
+          setExercises(updatedExercises);
+      };
+
+      const handleUpdateSet = (exerciseIndex, setIndex, field, value) => {
+          const updatedExercises = [...exercises];
+          updatedExercises[exerciseIndex].sets[setIndex][field] = value;
+          setExercises(updatedExercises);
+      };
+
+      const handleEditWorkout = (index) => {
+          const workoutToEdit = workoutHistory[index];
+          setWorkoutInProgress(true);
+          setWorkoutStartTime(workoutToEdit.time);
+          setExercises(workoutToEdit.exercises);
+          setNotes(workoutToEdit.notes);
+          setIsEditingWorkout(index); // Set editing index
+      };
+
+      const handleSaveEditedWorkout = () => {
+          const updatedHistory = [...workoutHistory];
+          updatedHistory[isEditingWorkout] = {
+              time: workoutStartTime,
+              exercises,
+              notes,
+          };
+          setWorkoutHistory(updatedHistory);
+          setIsEditingWorkout(null); // Clear editing index
+          setWorkoutInProgress(false);
+          alert("Workout updated successfully!");
+      };
+
+      const handleEditWorkoutTime = (index, newTime) => {
+          const updatedHistory = [...workoutHistory];
+          updatedHistory[index].time = new Date(newTime);
+          setWorkoutHistory(updatedHistory);
+      };
+
+      const handleStartCardioWorkout = async (e) => {
+          e.preventDefault();
+          setWorkoutInProgress(true);
+          setWorkoutStartTime(new Date());
+          setCardioExercises([]); // Reset cardio-specific exercises
+          setNotes("");
+
+          var obj = {
+              setName: "NewCardio",
+              exercises: cardioExercises,
+              userId: JSON.parse(localStorage.getItem('user_data')).id
+          };
+          var js = JSON.stringify(obj);
+
+          try {
+              const response = await fetch('https://largeproject.mattct027.xyz/api/create-set', {
+                  method: 'POST',
+                  body: js,
+                  headers: {
+                      'Content-Type': 'application/json'
+                  }
+              });
+
+              var res = JSON.parse(await response.text());
+
+              if (res.error.length <= 0) {
+                  // Workout/set successfully created
+              } else {
+                  alert(res.error);
+              }
+          } catch {
+              alert(e.toString);
+          }
+      };
+
+      const handleCancelCardioWorkout = async (e) => {
+          e.preventDefault();
+          if (window.confirm("Are you sure you want to cancel this workout? All progress will be lost.")) {
+              setWorkoutInProgress(false);
+              setCardioExercises([]); // Reset cardio-specific exercises
+              setWorkoutStartTime(new Date());
+              setNotes("");
+
+              var obj = {
+                  setName: "NewCardio"
+              };
+              var js = JSON.stringify(obj);
+
+              try {
+                  const response = await fetch('https://largeproject.mattct027.xyz/api/delete-set', {
+                      method: 'POST',
+                      body: js,
+                      headers: {
+                          'Content-Type': 'application/json'
+                      }
+                  });
+
+                  var res = JSON.parse(await response.text());
+
+                  if (res.error.length <= 0) {
+                      // Workout/set successfully deleted
+                      alert(res.message);
+                  } else {
+                      alert(res.error);
+                  }
+              } catch {
+                  alert(e.toString);
+              }
+          }
+      };
+
+      const handleFinishCardioWorkout = async (e) => {
+          //e.preventDefault();
+          const completedWorkout = {
+              time: workoutStartTime,
+              exercises: cardioExercises,
+              notes,
+          };
+          setCardioHistory([...cardioHistory, completedWorkout]); // Save to cardio-specific history
+          alert("Cardio workout completed!");
+          setWorkoutInProgress(false);
+          setWorkoutStartTime(new Date());
+          setNotes("");
+
+          var obj = {
+              setName: "NewCardio",
+              newSetName: "FinishedCardio",
+              exercises: cardioExercises
+          };
+          var js = JSON.stringify(obj);
+
+          try {
+              const response = await fetch('https://largeproject.mattct027.xyz/api/update-set', {
+                  method: 'POST',
+                  body: js,
+                  headers: {
+                      'Content-Type': 'application/json'
+                  }
+              });
+
+              var res = JSON.parse(await response.text());
+
+              if (res.error.length <= 0) {
+                  // Cardio workout/set successfully updated
+              } else {
+                  alert(res.error);
+              }
+          } catch {
+              alert(e.toString);
+          }
+
+          setCardioExercises([]); // Clear cardio-specific exercises
+      };
+
+      const handleAddCardioExercise = async (e) => {
+          e.preventDefault();
+          if (!currentExercise.trim()) {
+              alert("Please enter an exercise name.");
+              return;
+          }
+          setCardioExercises([
+              ...cardioExercises,
+              {
+                  name: currentExercise.trim(),
+                  sets: [],
+              },
+          ]);
+
+          var obj = {
+              name: currentExercise.trim(),
+              muscleGroup: currentMuscleGroup.trim(),
+              equipmentType: currentEquipmentType.trim()
+          };
+          var js = JSON.stringify(obj);
+
+          setCurrentExercise("");
+          setCurrentMuscleGroup("");
+          setCurrentEquipmentType("");
+
+          try {
+              const response = await fetch('https://largeproject.mattct027.xyz/api/create-exercise', {
+                  method: 'POST',
+                  body: js,
+                  headers: {
+                      'Content-Type': 'application/json'
+                  }
+              });
+
+              var res = JSON.parse(await response.text());
+
+              if (res.error.length <= 0) {
+                  // Add Cardio Exercise is successful
+              } else {
+                  alert(res.error);
+              }
+          } catch {
+              alert(e.toString());
+          }
+      };
+
+      const handleAddCardioSet = (exerciseIndex) => {
+          const updatedExercises = [...cardioExercises];
+          updatedExercises[exerciseIndex].sets.push({
+              time: "",
+              distance: ""
+          });
+          setCardioExercises(updatedExercises);
+      };
+
+      const handleDeleteCardioSet = (exerciseIndex, setIndex) => {
+          const updatedExercises = [...cardioExercises];
+          updatedExercises[exerciseIndex].sets.splice(setIndex, 1);
+          setCardioExercises(updatedExercises);
+      };
+
+      const handleUpdateCardioSet = (exerciseIndex, setIndex, field, value) => {
+          const updatedExercises = [...cardioExercises];
+          updatedExercises[exerciseIndex].sets[setIndex][field] = value;
+          setCardioExercises(updatedExercises);
+      };
+
+      const handleEditCardioWorkout = (index) => {
+          const workoutToEdit = cardioHistory[index];
+          setWorkoutInProgress(true);
+          setWorkoutStartTime(workoutToEdit.time);
+          setCardioExercises(workoutToEdit.exercises);
+          setNotes(workoutToEdit.notes);
+          setIsEditingWorkout(index); // Set editing index
+      };
+
+      const handleSaveEditedCardioWorkout = () => {
+          const updatedHistory = [...cardioHistory];
+          updatedHistory[isEditingWorkout] = {
+              time: workoutStartTime,
+              exercises: cardioExercises,
+              notes,
+          };
+          setCardioHistory(updatedHistory);
+          setIsEditingWorkout(null); // Clear editing index
+          setWorkoutInProgress(false);
+          alert("Cardio workout updated successfully!");
+      };
+
+      const handleEditCardioWorkoutTime = (index, newTime) => {
+          const updatedHistory = [...cardioHistory];
+          updatedHistory[index].time = new Date(newTime);
+          setCardioHistory(updatedHistory);
+      };
+
+      if (isSignedOut) {
+          return < Home / > ;
+      }
+      
   return (
     <div>
       <header className="home-header">
