@@ -521,6 +521,28 @@ const HomePage = () => {
       setCardioHistory(updatedHistory);
   };
 
+  const handleDeleteWorkout = (index) => {
+    const updatedWorkouts = [...workoutHistory];
+    updatedWorkouts.splice(index, 1); // Remove the workout at the given index
+    setWorkoutHistory(updatedWorkouts); // Update the state
+
+    // Update localStorage
+    localStorage.setItem("workoutHistory", JSON.stringify(updatedWorkouts));
+
+    alert("Workout deleted successfully.");
+  };
+
+  const handleDeleteCardioWorkout = (index) => {
+    const updatedCardioWorkouts = [...cardioHistory];
+    updatedCardioWorkouts.splice(index, 1); // Remove the cardio workout at the given index
+    setCardioHistory(updatedCardioWorkouts); // Update the state
+
+    // Update localStorage
+    localStorage.setItem("cardioHistory", JSON.stringify(updatedCardioWorkouts));
+
+    alert("Cardio workout deleted successfully.");
+  };
+
   if (isSignedOut) {
       return < Home / > ;
   }
@@ -762,6 +784,12 @@ const HomePage = () => {
                     >
                       Edit Workout
                     </button>
+                    <button
+                      className="log-button delete-button"
+                      onClick={() => handleDeleteWorkout(index)}
+                    >
+                      Delete Workout
+                  </button>
                   </div>
                 ))}
               </div>
@@ -910,6 +938,12 @@ const HomePage = () => {
                     onClick={() => handleEditCardioWorkout(index)}
                   >
                     Edit Workout
+                  </button>
+                  <button
+                    className="log-button delete-button"
+                    onClick={() => handleDeleteCardioWorkout(index)}
+                  >
+                    Delete Workout
                   </button>
                 </div>
               ))}
