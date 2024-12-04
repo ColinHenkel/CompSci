@@ -77,6 +77,60 @@ const HomePage = () => {
       }
   };
 
+  const handleRetrieveSets = async (e) => {
+    // e.preventDefault();
+
+    const userData = JSON.parse(localStorage.getItem('user_data'));
+    if (!userData || !userData.id) {
+        alert('User not logged in.');
+        return;
+    }
+
+    var obj = { userId: userData.id };
+    var js = JSON.stringify(obj);
+
+    try {
+        const response = await fetch('https://largeproject.mattct027.xyz/api/retrieve-set', {
+            method: 'POST',
+            body: js,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        var res = await response.json();
+
+        if (res.error && res.error.length > 0) {
+            alert(res.error);
+        } else {
+            // Successfully retrieved sets
+            console.log(res.sets);
+
+            // Save retrieved sets to workoutHistory state
+            const mappedWorkouts = res.sets
+            .filter(workout => Array.isArray(workout.Exercises)) // Ensure Exercises is an array
+            .map(workout => ({
+              exercises: workout.Exercises.filter(exercise => Array.isArray(exercise.sets)).map(exercise => ({
+                ...exercise,
+                sets: exercise.sets.map(set => ({
+                  weight: parseInt(set.weight, 10),
+                  reps: parseInt(set.reps, 10),
+                })),
+              })),
+              notes: "",
+            }));
+
+            setWorkoutHistory([...workoutHistory, ...mappedWorkouts]);         
+
+            // Also save the retrieved sets to localStorage
+            // localStorage.setItem("workoutHistory", JSON.stringify(res.sets));
+        }
+    } catch (err) {
+        alert('Error occurred: ' + err.toString());  
+    }
+  };
+
+
   const signOut = () => {
       localStorage.removeItem("user_data");
       setIsSignedOut(true);
@@ -107,7 +161,6 @@ const HomePage = () => {
   const handleStartWorkout = async (e) => {
       e.preventDefault();
       setWorkoutInProgress(true);
-      setWorkoutStartTime(new Date());
       setExercises([]);
       setNotes("");
 
@@ -144,7 +197,6 @@ const HomePage = () => {
       if (window.confirm("Are you sure you want to cancel this workout? All progress will be lost.")) {
           setWorkoutInProgress(false);
           setExercises([]);
-          setWorkoutStartTime(new Date());
           setNotes("");
 
           var obj = {
@@ -187,7 +239,6 @@ const HomePage = () => {
 
       const completedWorkout = {
         name: name,
-        time: workoutStartTime,
         exercises,
         notes,
     };
@@ -196,7 +247,6 @@ const HomePage = () => {
       setWorkoutHistory([...workoutHistory, completedWorkout]);
       alert("Workout completed!");
       setWorkoutInProgress(false);
-      setWorkoutStartTime(new Date());
       setNotes("");
 
       var obj = {
@@ -299,7 +349,6 @@ const HomePage = () => {
   const handleEditWorkout = (index) => {
       const workoutToEdit = workoutHistory[index];
       setWorkoutInProgress(true);
-      setWorkoutStartTime(workoutToEdit.time);
       setExercises(workoutToEdit.exercises);
       setNotes(workoutToEdit.notes);
       setIsEditingWorkout(index); // Set editing index
@@ -308,7 +357,6 @@ const HomePage = () => {
   const handleSaveEditedWorkout = () => {
       const updatedHistory = [...workoutHistory];
       updatedHistory[isEditingWorkout] = {
-          time: workoutStartTime,
           exercises,
           notes,
       };
@@ -327,7 +375,6 @@ const HomePage = () => {
   const handleStartCardioWorkout = async (e) => {
       e.preventDefault();
       setWorkoutInProgress(true);
-      setWorkoutStartTime(new Date());
       setCardioExercises([]); // Reset cardio-specific exercises
       setNotes("");
 
@@ -364,7 +411,6 @@ const HomePage = () => {
       if (window.confirm("Are you sure you want to cancel this workout? All progress will be lost.")) {
           setWorkoutInProgress(false);
           setCardioExercises([]); // Reset cardio-specific exercises
-          setWorkoutStartTime(new Date());
           setNotes("");
 
           var obj = {
@@ -406,7 +452,6 @@ const HomePage = () => {
 
       const completedWorkout = {
         name: name,
-        time: workoutStartTime,
         exercises: cardioExercises,
         notes,
       };
@@ -415,7 +460,6 @@ const HomePage = () => {
       setCardioHistory([...cardioHistory, completedWorkout]); // Save to cardio-specific history
       alert("Cardio workout completed!");
       setWorkoutInProgress(false);
-      setWorkoutStartTime(new Date());
       setNotes("");
 
       var obj = {
@@ -518,7 +562,6 @@ const HomePage = () => {
   const handleEditCardioWorkout = (index) => {
       const workoutToEdit = cardioHistory[index];
       setWorkoutInProgress(true);
-      setWorkoutStartTime(workoutToEdit.time);
       setCardioExercises(workoutToEdit.exercises);
       setNotes(workoutToEdit.notes);
       setIsEditingWorkout(index); // Set editing index
@@ -527,7 +570,6 @@ const HomePage = () => {
   const handleSaveEditedCardioWorkout = () => {
       const updatedHistory = [...cardioHistory];
       updatedHistory[isEditingWorkout] = {
-          time: workoutStartTime,
           exercises: cardioExercises,
           notes,
       };
@@ -641,7 +683,10 @@ const HomePage = () => {
             <li>
               <button
                 className={`nav-link ${activeTab === "Weight Training" ? "active" : ""}`}
-                onClick={() => handleTabClick("Weight Training")}
+                onClick={() => {
+                  handleRetrieveSets()
+                  handleTabClick("Weight Training")
+                }}
               >
                 Weight Training
               </button>
@@ -727,7 +772,7 @@ const HomePage = () => {
                 <>
                   <div className="workout-details">
                     <p>
-                      <strong>Started at:</strong> {workoutStartTime.toLocaleString()}
+                      {/* <strong>Started at:</strong> {workoutStartTime.toLocaleString()} */}
                     </p>
                     <input
                       type="text"
@@ -830,7 +875,7 @@ const HomePage = () => {
               <div className="workout-history">
                 {workoutHistory.map((workout, index) => (
                   <div key={index} className="workout-history-item">
-                    <p>
+                    {/* <p>
                       Workout at:{" "}
                       <input
                         type="datetime-local"
@@ -840,7 +885,7 @@ const HomePage = () => {
                         }
                         className="modern-input"
                       />
-                    </p>
+                    </p> */}
                     {workout.exercises.map((exercise, exerciseIndex) => (
                       <div key={exerciseIndex}>
                         <strong>{exercise.name}</strong>
@@ -886,7 +931,7 @@ const HomePage = () => {
                 <>
                   <div className="workout-details">
                     <p>
-                      <strong>Started at:</strong> {workoutStartTime.toLocaleString()}
+                      {/* <strong>Started at:</strong> {workoutStartTime.toLocaleString()} */}
                     </p>
                     <input
                       type="text"
@@ -983,7 +1028,7 @@ const HomePage = () => {
               )}
               {cardioHistory.map((workout, index) => (
                 <div key={index} className="workout-history-item">
-                  <p>
+                  {/* <p>
                     Workout at:{" "}
                     <input
                       type="datetime-local"
@@ -993,7 +1038,7 @@ const HomePage = () => {
                       }
                       className="modern-input"
                     />
-                  </p>
+                  </p> */}
                   {workout.exercises.map((exercise, exerciseIndex) => (
                     <div key={exerciseIndex} className="exercise-history">
                       <strong>{exercise.name}</strong>
