@@ -26,7 +26,7 @@ const HomePage = () => {
   const [workoutHistory, setWorkoutHistory] = useState([]);
   const [cardioExercises, setCardioExercises] = useState([]);
   const [cardioHistory, setCardioHistory] = useState([]);
-  const [isEditingWorkout, setIsEditingWorkout] = useState(null); // Track if editing a workout
+  const [isEditingWorkout, setIsEditingWorkout] = useState(null);
 
 
   // load data from localStorage on mount
@@ -78,7 +78,6 @@ const HomePage = () => {
   };
 
   const handleRetrieveSets = async (e) => {
-    // e.preventDefault();
 
     const userData = JSON.parse(localStorage.getItem('user_data'));
     if (!userData || !userData.id) {
@@ -103,12 +102,10 @@ const HomePage = () => {
         if (res.error && res.error.length > 0) {
             alert(res.error);
         } else {
-            // Successfully retrieved sets
             console.log(res.sets);
 
-            // Save retrieved sets to workoutHistory state
             const mappedWorkouts = res.sets
-            .filter(workout => Array.isArray(workout.Exercises)) // Ensure Exercises is an array
+            .filter(workout => Array.isArray(workout.Exercises))
             .map(workout => ({
               exercises: workout.Exercises.filter(exercise => Array.isArray(exercise.sets)).map(exercise => ({
                 ...exercise,
@@ -121,9 +118,6 @@ const HomePage = () => {
             }));
 
             setWorkoutHistory([...workoutHistory, ...mappedWorkouts]);         
-
-            // Also save the retrieved sets to localStorage
-            // localStorage.setItem("workoutHistory", JSON.stringify(res.sets));
         }
     } catch (err) {
         alert('Error occurred: ' + err.toString());  
@@ -243,7 +237,7 @@ const HomePage = () => {
         notes,
     };
   
-      setWorkoutName(name); // Save the workout name in state
+      setWorkoutName(name);
       setWorkoutHistory([...workoutHistory, completedWorkout]);
       alert("Workout completed!");
       setWorkoutInProgress(false);
@@ -351,7 +345,7 @@ const HomePage = () => {
       setWorkoutInProgress(true);
       setExercises(workoutToEdit.exercises);
       setNotes(workoutToEdit.notes);
-      setIsEditingWorkout(index); // Set editing index
+      setIsEditingWorkout(index);
   };
 
   const handleSaveEditedWorkout = () => {
@@ -361,21 +355,15 @@ const HomePage = () => {
           notes,
       };
       setWorkoutHistory(updatedHistory);
-      setIsEditingWorkout(null); // Clear editing index
+      setIsEditingWorkout(null);
       setWorkoutInProgress(false);
       alert("Workout updated successfully!");
-  };
-
-  const handleEditWorkoutTime = (index, newTime) => {
-      const updatedHistory = [...workoutHistory];
-      updatedHistory[index].time = new Date(newTime);
-      setWorkoutHistory(updatedHistory);
   };
 
   const handleStartCardioWorkout = async (e) => {
       e.preventDefault();
       setWorkoutInProgress(true);
-      setCardioExercises([]); // Reset cardio-specific exercises
+      setCardioExercises([]);
       setNotes("");
 
       var obj = {
@@ -410,7 +398,7 @@ const HomePage = () => {
       e.preventDefault();
       if (window.confirm("Are you sure you want to cancel this workout? All progress will be lost.")) {
           setWorkoutInProgress(false);
-          setCardioExercises([]); // Reset cardio-specific exercises
+          setCardioExercises([]);
           setNotes("");
 
           var obj = {
@@ -442,7 +430,6 @@ const HomePage = () => {
   };
 
   const handleFinishCardioWorkout = async (e) => {
-      //e.preventDefault();
       const name = prompt("Please enter a name for your workout:");
 
       if (!name) {
@@ -456,8 +443,8 @@ const HomePage = () => {
         notes,
       };
 
-      setWorkoutName(name); // Save the workout name in state
-      setCardioHistory([...cardioHistory, completedWorkout]); // Save to cardio-specific history
+      setWorkoutName(name);
+      setCardioHistory([...cardioHistory, completedWorkout]);
       alert("Cardio workout completed!");
       setWorkoutInProgress(false);
       setNotes("");
@@ -489,7 +476,7 @@ const HomePage = () => {
           alert(e.toString);
       }
 
-      setCardioExercises([]); // Clear cardio-specific exercises
+      setCardioExercises([]);
   };
 
   const handleAddCardioExercise = async (e) => {
@@ -564,7 +551,7 @@ const HomePage = () => {
       setWorkoutInProgress(true);
       setCardioExercises(workoutToEdit.exercises);
       setNotes(workoutToEdit.notes);
-      setIsEditingWorkout(index); // Set editing index
+      setIsEditingWorkout(index);
   };
 
   const handleSaveEditedCardioWorkout = () => {
@@ -574,15 +561,9 @@ const HomePage = () => {
           notes,
       };
       setCardioHistory(updatedHistory);
-      setIsEditingWorkout(null); // Clear editing index
+      setIsEditingWorkout(null);
       setWorkoutInProgress(false);
       alert("Cardio workout updated successfully!");
-  };
-
-  const handleEditCardioWorkoutTime = (index, newTime) => {
-      const updatedHistory = [...cardioHistory];
-      updatedHistory[index].time = new Date(newTime);
-      setCardioHistory(updatedHistory);
   };
 
   const handleDeleteWorkout = async (index) => {
@@ -615,10 +596,9 @@ const HomePage = () => {
         alert("Caught error");
     }
 
-    updatedWorkouts.splice(index, 1); // Remove the workout at the given index
-    setWorkoutHistory(updatedWorkouts); // Update the state
+    updatedWorkouts.splice(index, 1);
+    setWorkoutHistory(updatedWorkouts);
 
-    // Update localStorage
     localStorage.setItem("workoutHistory", JSON.stringify(updatedWorkouts));
   };
 
@@ -652,10 +632,9 @@ const HomePage = () => {
         alert("Caught error");
     }
 
-    updatedCardioWorkouts.splice(index, 1); // Remove the cardio workout at the given index
-    setCardioHistory(updatedCardioWorkouts); // Update the state
+    updatedCardioWorkouts.splice(index, 1);
+    setCardioHistory(updatedCardioWorkouts);
 
-    // Update localStorage
     localStorage.setItem("cardioHistory", JSON.stringify(updatedCardioWorkouts));
   };
 
@@ -771,9 +750,6 @@ const HomePage = () => {
               ) : (
                 <>
                   <div className="workout-details">
-                    <p>
-                      {/* <strong>Started at:</strong> {workoutStartTime.toLocaleString()} */}
-                    </p>
                     <input
                       type="text"
                       placeholder="Exercise Name (e.g., Deadlift)"
@@ -875,17 +851,6 @@ const HomePage = () => {
               <div className="workout-history">
                 {workoutHistory.map((workout, index) => (
                   <div key={index} className="workout-history-item">
-                    {/* <p>
-                      Workout at:{" "}
-                      <input
-                        type="datetime-local"
-                        value={new Date(workout.time).toISOString().slice(0, 16)}
-                        onChange={(e) =>
-                          handleEditWorkoutTime(index, new Date(e.target.value))
-                        }
-                        className="modern-input"
-                      />
-                    </p> */}
                     {workout.exercises.map((exercise, exerciseIndex) => (
                       <div key={exerciseIndex}>
                         <strong>{exercise.name}</strong>
@@ -930,9 +895,6 @@ const HomePage = () => {
               ) : (
                 <>
                   <div className="workout-details">
-                    <p>
-                      {/* <strong>Started at:</strong> {workoutStartTime.toLocaleString()} */}
-                    </p>
                     <input
                       type="text"
                       placeholder="Exercise Name (e.g., Run, Bike Ride)"
@@ -1028,17 +990,6 @@ const HomePage = () => {
               )}
               {cardioHistory.map((workout, index) => (
                 <div key={index} className="workout-history-item">
-                  {/* <p>
-                    Workout at:{" "}
-                    <input
-                      type="datetime-local"
-                      value={new Date(workout.time).toISOString().slice(0, 16)}
-                      onChange={(e) =>
-                        handleEditCardioWorkoutTime(index, new Date(e.target.value))
-                      }
-                      className="modern-input"
-                    />
-                  </p> */}
                   {workout.exercises.map((exercise, exerciseIndex) => (
                     <div key={exerciseIndex} className="exercise-history">
                       <strong>{exercise.name}</strong>
