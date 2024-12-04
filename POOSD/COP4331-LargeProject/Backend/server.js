@@ -152,41 +152,6 @@ app.post('/api/retrieve-exercise', async (req, res, next) => {
     res.status(200).json(ret);
 });
 
-/*app.post('/api/retrieve-set', async (req, res, next) => {
-    let error = '';
-
-    const { setName } = req.body;
-
-    if (!setName || setName.trim() === '') {
-        error = 'Set name is required';
-        return res.status(400).json({ error });
-    }
-
-    try {
-        const db = client.db();
-
-        const result = await db.collection('Sets').findOne({
-            SetName: { $regex: '^' + setName.trim() + '$', $options: 'i' }
-        });
-
-        if (!result) {
-            error = 'Set not found';
-            return res.status(404).json({ error });
-        }
-
-        const ret = {
-            setName: result.SetName,
-            exercises: result.Exercises,
-            userId: result.UserId,
-            error
-        };
-
-        res.status(200).json(ret);
-    } catch (e) {
-        error = e.toString();
-        res.status(500).json({ error });
-    }
-}); */
 
 app.post('/api/retrieve-set', async (req, res, next) => {
     let error = '';
@@ -348,5 +313,7 @@ app.post('/api/delete-exercise', async (req, res, next) => {
         res.status(500).json({ error });
     }
 });
+
+
 
 app.listen(5000);

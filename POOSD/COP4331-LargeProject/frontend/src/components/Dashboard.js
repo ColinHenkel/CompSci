@@ -28,25 +28,6 @@ const HomePage = () => {
   const [cardioHistory, setCardioHistory] = useState([]);
   const [isEditingWorkout, setIsEditingWorkout] = useState(null);
 
-
-  // load data from localStorage on mount
-  useEffect(() => {
-      const savedWorkoutHistory = JSON.parse(localStorage.getItem("workoutHistory")) || [];
-      setWorkoutHistory(savedWorkoutHistory);
-
-      const savedCardioHistory = JSON.parse(localStorage.getItem("cardioHistory")) || [];
-      setCardioHistory(savedCardioHistory);
-  }, []);
-
-  // save data to localStorage on state change
-  useEffect(() => {
-      localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
-  }, [workoutHistory]);
-
-  useEffect(() => {
-      localStorage.setItem("cardioHistory", JSON.stringify(cardioHistory));
-  }, [cardioHistory]);
-
   useEffect(() => {
       const savedStartingWeight = localStorage.getItem("startingWeight");
       const savedCurrentUserWeight = localStorage.getItem("currentUserWeight");
@@ -77,8 +58,12 @@ const HomePage = () => {
       }
   };
 
-  const handleRetrieveSets = async (e) => {
+  const resetWorkoutHistory = () => {
+      // setWorkoutHistory([""]);
+      setCardioHistory([]);
+  };
 
+  const handleRetrieveSets = async (e) => {
     const userData = JSON.parse(localStorage.getItem('user_data'));
     if (!userData || !userData.id) {
         alert('User not logged in.');
@@ -588,7 +573,6 @@ const HomePage = () => {
 
         if (res.error.length <= 0) {
             // Workout/set successfully deleted
-            alert(res.message);
         } else {
             alert(res.error);
         }
@@ -624,7 +608,6 @@ const HomePage = () => {
 
         if (res.error.length <= 0) {
             // Workout/set successfully deleted
-            alert(res.message);
         } else {
             alert(res.error);
         }
@@ -663,7 +646,10 @@ const HomePage = () => {
               <button
                 className={`nav-link ${activeTab === "Weight Training" ? "active" : ""}`}
                 onClick={() => {
-                  handleRetrieveSets()
+                  if (workoutHistory !== "") {
+                    resetWorkoutHistory()
+                    handleRetrieveSets()
+                  }
                   handleTabClick("Weight Training")
                 }}
               >
